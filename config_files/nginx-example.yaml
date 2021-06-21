@@ -1,0 +1,78 @@
+# ---
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: game-2048
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: game-2048
+  name: nginx
+spec:
+  selector:
+    matchLabels:
+      run: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 200m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: game-2048
+  name: nginx
+spec:
+  type: ClusterIP
+  selector:
+    run: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   namespace: game-2048
+#   name: nginx
+#   labels:
+#     run: nginx
+# spec:
+#   ports:
+#   - port: 80
+#   selector:
+#     run: nginx
+# ---
+# apiVersion: networking.k8s.io/v1beta1
+# kind: Ingress
+# metadata:
+#   namespace: game-2048
+#   name: nginx
+#   annotations:
+#     kubernetes.io/ingress.class: alb
+#     alb.ingress.kubernetes.io/scheme: internet-facing
+#     alb.ingress.kubernetes.io/target-type: ip
+# spec:
+#   rules:
+#     - http:
+#         paths:
+#           - path: /*
+#             backend:
+#               serviceName: nginx
+#               servicePort: 80
+
